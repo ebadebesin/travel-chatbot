@@ -1,21 +1,24 @@
 'use client'
 
-import { Box, Button, Stack, TextField } from '@mui/material'
-import { useState } from 'react'
-import React, { useRef, useEffect } from 'react'
+import { Box, Button, Stack, TextField, Typography, CircularProgress, Avatar } from '@mui/material'
+import { useState, useRef, useEffect } from 'react'
+import React from 'react'
+import Image from 'next/image'
+
+import TravelIcon from '../public/icon.png'  
 
 export default function Home() {
   const [messages, setMessages] = useState([
     {
       role: 'assistant',
-      content: "Hi! I'm the Travel support assistant. How can I help you today?",
+      content: "Hi! I'm the Globetrotter Travel support assistant. How can I help you today?",
     },
   ])
   const [message, setMessage] = useState('')
   const [isLoading, setIsLoading] = useState(false)
 
   const sendMessage = async () => {
-    if (!message.trim() || isLoading) return;  // Don't send empty messages
+    if (!message.trim() || isLoading) return; 
     setIsLoading(true)
   
     const userMessage = message;
@@ -91,21 +94,40 @@ export default function Home() {
       flexDirection="column"
       justifyContent="center"
       alignItems="center"
+      bgcolor="#f5f5f5"
     >
       <Stack
         direction={'column'}
-        width="500px"
-        height="700px"
-        border="1px solid black"
+        width="100%"
+        maxWidth="600px"
+        height="80vh"
+        borderRadius={8}
+        boxShadow="0 4px 8px rgba(0, 0, 0, 0.1)"
+        bgcolor="white"
         p={2}
-        spacing={3}
+        spacing={2}
       >
+        <Stack direction="row" alignItems="center" spacing={1} mb={2}>
+        <Image src={TravelIcon} alt="Travel Icon" width={40} height={40} />
+          <Typography
+            variant="h5"
+            component="h1"
+            align="center"
+            gutterBottom
+            sx={{ fontWeight: 'bold', color: '#333' }}
+          >
+            Travel Support Chatbot
+          </Typography>
+        </Stack>
         <Stack
           direction={'column'}
           spacing={2}
           flexGrow={1}
           overflow="auto"
           maxHeight="100%"
+          p={1}
+          border="1px solid #ddd"
+          borderRadius={4}
         >
           {messages.map((message, index) => (
             <Box
@@ -114,16 +136,20 @@ export default function Home() {
               justifyContent={
                 message.role === 'assistant' ? 'flex-start' : 'flex-end'
               }
+              mb={1}
             >
               <Box
                 bgcolor={
                   message.role === 'assistant'
-                    ? 'primary.main'
-                    : 'secondary.main'
+                    ? '#e0f7fa'
+                    : '#c5cae9'
                 }
-                color="white"
+                color="black"
                 borderRadius={16}
-                p={3}
+                p={2}
+                maxWidth="80%"
+                wordBreak="break-word"
+                boxShadow="0 2px 4px rgba(0, 0, 0, 0.1)"
               >
                 {message.content}
               </Box>
@@ -131,17 +157,26 @@ export default function Home() {
           ))}
           <div ref={messagesEndRef} />
         </Stack>
-        <Stack direction={'row'} spacing={2}>
+        <Stack direction={'row'} spacing={2} alignItems="center">
           <TextField
-            label="Message"
+            label="Type your message"
             fullWidth
+            variant="outlined"
             value={message}
             onChange={(e) => setMessage(e.target.value)}
-            onKeyPress={handleKeyPress}  // Add this to handle Enter key press
+            onKeyPress={handleKeyPress} 
             disabled={isLoading}
+            size="small"
+            sx={{ flexGrow: 1 }}
           />
-          <Button variant="contained" onClick={sendMessage} disabled={isLoading}>
-            {isLoading ? 'Sending...' : 'Send'}
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={sendMessage}
+            disabled={isLoading}
+            size="large"
+          >
+            {isLoading ? <CircularProgress size={24} color="inherit" /> : 'Send'}
           </Button>
         </Stack>
       </Stack>
