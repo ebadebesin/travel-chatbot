@@ -7,6 +7,11 @@ import Image from 'next/image'
 
 import TravelIcon from '../public/icon.png'  
 
+import firebase from '@/firebase';
+import 'firebase/compat/firestore';
+import 'firebase/compat/auth';
+
+
 export default function Home() {
   const [messages, setMessages] = useState([
     {
@@ -16,6 +21,18 @@ export default function Home() {
   ])
   const [message, setMessage] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+
+  async function logout() {
+    try {
+        await firebase.auth().signOut();
+        console.log('User signed out successfully.');
+        return { success: true };
+    } catch (error) {
+        console.error('Error during logout:', error);
+        return { error: 'Something went wrong.' };
+    }
+}
+
 
   const sendMessage = async () => {
     if (!message.trim() || isLoading) return; 
@@ -96,6 +113,18 @@ export default function Home() {
       alignItems="center"
       bgcolor="#f5f5f5"
     >
+      <Button color="primary" onClick={
+                    async () => {
+                        const confirm = window.confirm('Are you sure you want to logout?');
+                        if (!confirm) {
+                            return;
+                        }
+                        const response = await logout();
+                        if (response.success) {
+                            window.location.href = '/SignIn';
+                        }
+                    }
+                }>Logout</Button>
       <Stack
         direction={'column'}
         width="100%"
