@@ -11,6 +11,7 @@ import firebase from '@/firebase';
 import 'firebase/compat/firestore';
 import 'firebase/compat/auth';
 
+import { getAuth, signOut } from "firebase/auth";
 
 export default function Home() {
   const [messages, setMessages] = useState([
@@ -21,6 +22,10 @@ export default function Home() {
   ])
   const [message, setMessage] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+  const [isSignedIn, setIsSignedIn] = useState(false);
+    const auth = getAuth();
+
+    
 
   async function logout() {
     try {
@@ -102,6 +107,32 @@ export default function Home() {
     scrollToBottom()
   }, [messages])
 
+  const handleButtonClick = async () => {
+    if (!isSignedIn) {
+        // Redirect to sign-in page
+        window.location.href = '/SignIn';
+    } else {
+        // Ask for confirmation before logging out
+        const confirm = window.confirm('Are you sure you want to logout?');
+        if (!confirm) {
+            return;
+        }
+        // Log out the user
+        await signOut(auth);
+        window.location.href = '/SignIn'; // Redirect after sign-out
+    }
+  }
+
+  useEffect(() => {
+    // Check if the user is signed in
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+        setIsSignedIn(!!user); // If user is not null, then user is signed in
+    });
+
+    // Cleanup the subscription on unmount
+    return () => unsubscribe();
+  }, [auth]);
+
 
   return (
     <Box
@@ -113,7 +144,7 @@ export default function Home() {
       alignItems="center"
       bgcolor="#f5f5f5"
     >
-      <Button color="primary" onClick={
+      {/* <Button color="primary" onClick={
                     async () => {
                         const confirm = window.confirm('Are you sure you want to logout?');
                         if (!confirm) {
@@ -124,7 +155,24 @@ export default function Home() {
                             window.location.href = '/SignIn';
                         }
                     }
-                }>Logout</Button>
+                }>Logout</Button> */}
+
+          <Button color="primary" onClick={handleButtonClick}
+            sx={{
+              padding: '12px 24px', // Adjust padding as desired
+              boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)', // Adds shadow for elevation
+              borderRadius: '8px', // Optional: for rounded corners
+              backgroundColor: 'lightblue', // Changes button color to blue
+              color: 'white', // Text color (white against blue background)
+              position: 'relative', // Use relative positioning
+              top: '-0.2in', // Moves the button up by 1 inch
+              '&:hover': {
+                backgroundColor: 'darkblue', // Darker blue on hover
+              },
+            }}>
+            {isSignedIn ? 'Logout' : 'Sign In'}
+          </Button>
+
       <Stack
         direction={'column'}
         width="100%"
